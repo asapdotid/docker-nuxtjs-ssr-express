@@ -1,4 +1,4 @@
-# Docker for NuxtJs Universal (SSR) use + Express Js start use PM2
+# Docker for NuxtJs Universal (SSR) + Express Js + PM2
 
 > Configuration for `Staging` & `Production` purpose
 
