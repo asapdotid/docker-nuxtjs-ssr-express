@@ -1,0 +1,66 @@
+version: '3'
+
+networks:
+
+  app-tier:
+    driver: bridge
+
+services:
+
+  nuxt-bstag:
+    container_name: nuxt-bstag
+    build:
+      context: ./docker/nodejs
+    user: ${ENV_DOCKER_USER}:${ENV_DOCKER_GROUP}
+    restart: always
+    environment:
+      - 'TZ=${TIMEZONE}'
+      - 'NODE_IMAGE_VER=${NODE_INS_VERSION}-${NODE_OS_VERSION}'
+      - 'PROJECT_DIR=${PROJECT_DIR}-staging'
+      - 'NODE_PORT=${NODE_PORT}'
+      - 'BUILD_FLAG=staging'
+    networks:
+      - app-tier
+    expose:
+      - '${NODE_PORT}'
+    volumes:
+      - ./public-html:/app:rw
+
+  nuxt-bprod:
+    container_name: nuxt-bprod
+    build:
+      context: ./docker/nodejs
+    user: ${ENV_DOCKER_USER}:${ENV_DOCKER_GROUP}
+    restart: always
+    environment:
+      - 'TZ=${TIMEZONE}'
+      - 'NODE_IMAGE_VER=${NODE_INS_VERSION}-${NODE_OS_VERSION}'
+      - 'PROJECT_DIR=${PROJECT_DIR}-production'
+      - 'NODE_PORT=${NODE_PORT}'
+      - 'BUILD_FLAG=production'
+    networks:
+      - app-tier
+    expose:
+      - '${NODE_PORT}'
+    volumes:
+      - ./public-html:/app:rw
+
+  httpd:
+    container_name: nginx
+    image: bitnami/nginx:${NGINX_VERSION}-${NGINX_OS_VERSION}
+    user: ${ENV_DOCKER_USER}:${ENV_DOCKER_GROUP}
+    restart: always
+    environment:
+      - 'TZ=${TIMEZONE}'
+    depends_on:
+      - nuxt-bstag
+      - nuxt-bprod
+    networks:
+      - app-tier
+    ports:
+      - '80:8080'
+      - '443:8443'
+    volumes:
+      - ./config/nginx/vhost:/opt/bitnami/nginx/conf/vhosts:ro
+      - ./logs/nginx/${NGINX_VERSION}:/opt/bitnami/nginx/logs:rw
+      - ./public-html:/app:rw

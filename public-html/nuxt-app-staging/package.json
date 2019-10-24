@@ -1,0 +1,26 @@
+{
+  "name": "nuxt-app-staging",
+  "version": "1.0.0",
+  "description": "My bedazzling Nuxt.js project",
+  "author": "Agung S Saputra",
+  "private": true,
+  "scripts": {
+    "clean": "rimraf .nuxt",
+    "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
+    "build-staging": "npm run clean && nuxt build -c nuxt.config.staging.js",
+    "build-production": "npm run clean && nuxt build -c nuxt.config.production.js",
+    "start": "pm2 start ecosystem.config.js --only nuxt-app && pm2 logs",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "nuxt": "^2.0.0",
+    "cross-env": "^5.2.0",
+    "dotenv": "^8.1.0",
+    "express": "^4.16.4",
+    "rimraf": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9",
+    "@nuxtjs/tailwindcss": "^1.0.0"
+  }
+}
